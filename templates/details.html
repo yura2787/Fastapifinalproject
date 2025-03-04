@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+
+<div class="container mx-auto p-2">
+
+<div class="card mb-3" style="max-width: 540px;">
+  <div class="row g-0">
+    <div class="col-md-4">
+      <img src="{{ tour.cover }}" class="img-fluid rounded-start" alt="...">
+    </div>
+    <div class="col-md-8">
+      <div class="card-body">
+        <h5 class="card-title">{{ tour.title }}</h5>
+        <p class="card-text">{{ tour.description }}</p>
+        <p class="card-text">Кількість людей: {{ tour.tourist }}</p>
+        <p class="card-text">Дата виліту: {{ tour.tate_of_dispatch }}</p>
+        <p class="card-text">Скільки днів: {{ tour.tour_duration }}</p>
+        <p class="card-text">Тип кімнати: {{ tour.type_room }}</p>
+        <p class="card-text">Сервіс: {{ tour.services }}</p>
+        <p class="card-text"><small class="text-body-secondary">Ціна: {{ tour.price }}$</small></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+{% endblock %}
