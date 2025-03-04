@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+
+<div class="row ms-3 mt-0 mt-1">
+
+  {% for tour in tours %}
+
+    <div class="card s-3 mt-0 mt-1 g-3" style="width: 18rem;">
+      <img src="{{ tour.cover }}" class="card-img-top" alt="...">
+      <div class="card-body">
+        <h5 class="card-title">{{ tour.title }}</h5>
+        <p class="card-text">{{ tour.description|truncate(80) }}</p>
+        <a href="{{ url_for('get_tour_info', tour_id=tour.id) }}" class="btn btn-primary">Детальніше</a>
+      </div>
+    </div>
+
+
+
+
+  {% endfor %}
+
+</div>
+
+
+{% endblock %}
