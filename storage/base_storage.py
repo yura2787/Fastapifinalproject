@@ -6,7 +6,7 @@ from fastapi import HTTPException, status
 
 from pymongo import MongoClient
 
-from schemas import NewTour, SavedTour
+from schemas import NewTour, SavedTour, TourId, PatchTour
 from settings import settings
 
 class BaseStorage(ABC):
@@ -15,7 +15,7 @@ class BaseStorage(ABC):
         pass
 
     @abstractmethod
-    def get_tour(self, tour_id: str) -> SavedTour:
+    def get_tour(self, tour_id: str, with_raise) -> SavedTour:
         pass
 
     @abstractmethod
@@ -27,6 +27,10 @@ class BaseStorage(ABC):
     def delete_tour(self, tour_id: str) -> None:
         pass
 
+    @abstractmethod
+    def patch_tour(self, tour_id: str, data: PatchTour) -> SavedTour:
+        pass
+
 
 class MongoStorage(BaseStorage):
     def __init__(self, uri: str):
@@ -34,6 +38,17 @@ class MongoStorage(BaseStorage):
         db = client.tour
         collection_tour = db.products
         self.collection_tour = collection_tour
+
+
+    def patch_tour(self, tour_id: str, data: PatchTour) -> SavedTour:
+        query = {"id": tour_id}
+        payload = {"$set": {"price": data.price, "title": data.title}}
+        result = self.collection_tour.update_one(query, payload)
+        if result.modified_count != 1:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Product not found"
+            )
+        return self.get_tour(tour_id)
 
     def create_tour(self, new_tour: NewTour) -> SavedTour:
         payload = {
@@ -53,9 +68,14 @@ class MongoStorage(BaseStorage):
         saved_product = SavedTour(**payload)
         return saved_product
 
-    def get_tour(self, tour_id: str) -> SavedTour:
+    def get_tour(
+        self, tour_id: str, with_raise: bool = True
+    ) -> SavedTour | None:
         query = {"id": tour_id}
         tour = self.collection_tour.find_one(query)
+        if not tour and not with_raise:
+            return None
+
         if not tour:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Product not found"
